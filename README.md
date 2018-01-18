@@ -10,7 +10,8 @@ npm install @bitr/logger
 ```
 
 # Usage
-```
+
+```JavaScript
   const log = logger.getLogger('label');
   log.warn('warn log');
   log.info('info log');
