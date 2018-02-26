@@ -5,10 +5,10 @@ import * as util from 'util';
 export const options = { enabled: process.env.NODE_ENV === 'test' ? false : true };
 
 export interface Logger {
-  debug: (s: string, ...args: any[]) => void;
-  info: (s: string, ...args: any[]) => void;
-  warn: (s: string, ...args: any[]) => void;
-  error: (s: string, ...args: any[]) => void;
+  debug: (s: string | object, ...args: any[]) => void;
+  info: (s: string | object, ...args: any[]) => void;
+  warn: (s: string | object, ...args: any[]) => void;
+  error: (s: string | object, ...args: any[]) => void;
 }
 
 const logger = pino({ level: 'debug' });
@@ -23,10 +23,34 @@ export function getLogger(label: string): Logger {
   }
   const childLogger = logger.child({ label });
   const wrappedLogger = {
-    debug: (s: string, ...args) => childLogger.debug(util.format(s, ...args)),
-    info: (s: string, ...args) => childLogger.info(util.format(s, ...args)),
-    warn: (s: string, ...args) => childLogger.warn(util.format(s, ...args)),
-    error: (s: string, ...args) => childLogger.error(util.format(s, ...args))
+    debug: (s: string | object, ...args) => {
+      if (typeof s === 'string') {
+        childLogger.debug(util.format(s, ...args));
+      } else if (args.length > 0) {
+        childLogger.debug(s, util.format(args[0], ..._.tail(args)));
+      }
+    },
+    info: (s: string | object, ...args) => {
+      if (typeof s === 'string') {
+        childLogger.info(util.format(s, ...args));
+      } else if (args.length > 0) {
+        childLogger.info(s, util.format(args[0], ..._.tail(args)));
+      }
+    },
+    warn: (s: string | object, ...args) => {
+      if (typeof s === 'string') {
+        childLogger.warn(util.format(s, ...args));
+      } else if (args.length > 0) {
+        childLogger.warn(s, util.format(args[0], ..._.tail(args)));
+      }
+    },
+    error: (s: string | object, ...args) => {
+      if (typeof s === 'string') {
+        childLogger.error(util.format(s, ...args));
+      } else if (args.length > 0) {
+        childLogger.error(s, util.format(args[0], ..._.tail(args)));
+      }
+    }
   };
   cache.set(label, wrappedLogger);
   return wrappedLogger;

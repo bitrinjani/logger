@@ -9,12 +9,24 @@ test('logger', () => {
   log.debug('debug log');
   const log2 = logger.getLogger('label');
   expect(log).toBe(log2);
-  logger.options.enabled = false;
-  log.info('not shown');
 });
 
-test('logger disabled', () => {  
+test('logger with obj', () => {
+  const log = logger.getLogger('obj');
+  log.warn({ hidden: true }, '[hidden]warn log');
+  log.info({ hidden: true }, '[hidden]info log');
+  log.error({ hidden: true }, '[hidden]error log');
+  log.debug({ hidden: true }, '[hidden]debug log');
+  log.warn({ hidden: true });
+  log.info({ hidden: true });
+  log.error({ hidden: true });
+  log.debug({ hidden: true });
+});
+
+test('logger disabled', () => {
   logger.options.enabled = false;
   const log = logger.getLogger('label');
   log.info('not shown');
+  logger.options.enabled = true;
 });
+
